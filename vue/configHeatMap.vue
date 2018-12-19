@@ -26,6 +26,7 @@
               <span class="md-caption">{{conf.name}}</span>
               <md-field md-inline>
                 <md-input type="number"
+                          :disabled="conf.name == 'average'"
                           v-model="conf.value"
                           @change="calculateAverage"></md-input>
               </md-field>
@@ -36,7 +37,8 @@
                 <div class="current-color"
                      :style="'background-color: ' + conf.color"
                      @click="togglePicker(conf)"></div>
-                <chrome-picker v-model="conf.color"
+                <chrome-picker :value="conf.color"
+                               v-model="conf.color"
                                v-if="conf.display"
                                @input="updateColor" />
               </div>
@@ -208,12 +210,12 @@ export default {
       return gradient.rgb(10);
     },
     calculateAverage() {
-      let max = parseInt(this.max.value);
-      let min = parseInt(this.min.value);
+      let max = parseInt(this.configs.find(el => el.name == "max").value);
+      let min = parseInt(this.configs.find(el => el.name == "min").value);
+      let average = this.configs.find(el => el.name == "average");
 
-      console.log(max, min);
-
-      if (!isNaN(max) && !isNaN(min)) this.average.value = (max + min) / 2;
+      if (!isNaN(max) && !isNaN(min) && average)
+        average.value = (max + min) / 2;
     },
     getSelectLst(id) {
       return SpinalGraphService.getChildren(id, [

@@ -22,6 +22,8 @@ const RELATION_NAME = "hasHeatMap";
 const constants = ContextGeographicService.constants;
 
 
+let tinygradient = require("tinygradient");
+
 class ActiveMapConf extends SpinalContextApp {
   constructor() {
     super(
@@ -47,14 +49,14 @@ class ActiveMapConf extends SpinalContextApp {
 
   async action(option) {
 
-    let name = (await hasHeatMap(option.selectedNode.id.get()))[0].name.get()
+    let heatmap = (await hasHeatMap(option.selectedNode.id.get()))[0];
 
     option.selectedNode.element.load().then(element => {
       let endpoints = [];
 
       for (let i = 0; i < element.connected.length; i++) {
         endpoints.push(getElementEndpoint(element.connected[i].get(),
-          name));
+          heatmap.name.get()));
       }
 
       Promise.all(endpoints).then(el => {
@@ -63,7 +65,8 @@ class ActiveMapConf extends SpinalContextApp {
           SpinalGraphService.getChildren(endpoint.parentId, [
             constants.EQUIPMENT_RELATION
           ]).then(equipment => {
-            colorElement(equipment, endpoint.endpoint);
+            colorElement(equipment, endpoint.endpoint,
+              heatmap);
           })
         })
       })
@@ -76,6 +79,9 @@ class ActiveMapConf extends SpinalContextApp {
 
 
 }
+
+export default ActiveMapConf;
+
 
 function getElementEndpoint(id, name) {
   return SpinalGraphService.getChildren(id, [dashboardVariables.ENDPOINT_RELATION_NAME])
@@ -97,16 +103,41 @@ function hasHeatMap(id) {
   })
 }
 
-function colorElement(elementInfo, endpointInfo) {
-  console.log(endpointInfo);
-  let itemToColor = [];
-  for (let i = 0; i < elementInfo.length; i++) {
-    const element = elementInfo[i];
+async function colorElement(elementInfo, endpointInfo, argHeatmap) {
+  let heatMap = await argHeatmap.element.load();
+  let endpoint = await endpointInfo.element.load();
 
-    itemToColor.push(element.dbid.get());
+  endpoint.currentValue.bind(() => {
+    let color = getElementColor(endpoint.currentValue.get(), heatMap);
 
-  }
-  window.v.select(itemToColor);
+    let itemToColor = [];
+    for (let i = 0; i < elementInfo.length; i++) {
+      const element = elementInfo[i];
+
+      itemToColor.push(element.dbid.get());
+
+    }
+
+    window.v.select(itemToColor);
+  })
+
+
 }
 
-export default ActiveMapConf;
+function getElementColor(elementValue, heatMap) {
+  let configs = heatMap.params.get();
+  let colorLength = 10;
+
+  let colors = [];
+  for (let i = 0; i < configs.length; i++) {
+    const element = configs[i];
+    colors.push(element.color);
+  }
+
+  if (typeof elementValue == "boolean") colorLength = 2;
+
+  let gradient = tinygradient(colors).rgb(colorLength);
+
+  console.log(gradient);
+
+}
