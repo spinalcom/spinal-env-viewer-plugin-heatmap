@@ -224,22 +224,6 @@ export default {
       this.average.color = val.hex;
       this.gradient = color.getGradientColor(this.min, this.average, this.max);
     },
-    /** End */
-
-    updateColor(conf) {
-      console.log(conf);
-    },
-    // getGradientColor() {
-    //   let colors = [];
-
-    //   for (let i = 0; i < this.configs.length; i++) {
-    //     colors.push(this.configs[i].color);
-    //   }
-
-    //   let gradient = tinygradient(colors);
-
-    //   return gradient.rgb(10);
-    // },
     calculateAverage() {
       let max = parseInt(this.max.value);
       let min = parseInt(this.min.value);

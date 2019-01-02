@@ -11,6 +11,8 @@ import {
 } from "spinal-env-viewer-graph-service";
 
 import ContextGeographicService from "spinal-env-viewer-context-geographic-service";
+import bimobjService from 'spinal-env-viewer-plugin-bimobjectservice';
+
 
 const RELATION_NAME = "hasHeatMap";
 
@@ -60,7 +62,7 @@ class ActiveMapConf extends SpinalContextApp {
     Promise.all(endpoints).then(el => {
       el.forEach(endpoint => {
         SpinalGraphService.getChildren(endpoint.parentId, [
-          constants.ENDPOINT_RELATION_NAME //must be replaced by REFERENCE_RELATION
+          bimobjService.constants.REFERENCE_OBJECT_RELATION_NAME //must be replaced by REFERENCE_RELATION
         ]).then(equipment => {
           colorElement(equipment, endpoint.endpoint, heatmap);
         });
@@ -98,12 +100,13 @@ async function colorElement(equipments, endpointInfo, argHeatmap) {
   let endpoint = await endpointInfo.element.load();
   endpoint.currentValue.bind(() => {
     let color = getElementColor(endpoint.currentValue.get(), heatMap);
+    console.log("color", color)
     let itemToColor = [];
     for (let i = 0; i < equipments.length; i++) {
       const element = equipments[i];
       itemToColor.push(element.dbid.get());
     }
-    window.v.setColorMaterial(itemToColor, color, endpoint.id.get());
+    window.v.setColorMaterial(itemToColor, `#${color}`, endpoint.id.get());
   });
 }
 
