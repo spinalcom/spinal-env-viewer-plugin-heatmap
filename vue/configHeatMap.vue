@@ -292,7 +292,7 @@ export default {
       };
     },
     isBoolean() {
-      return this.selected && this.selected.dataType == "boolean";
+      return this.selected && this.selected.dataType == "Boolean";
     }
   }
 };
