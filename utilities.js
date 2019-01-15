@@ -26,7 +26,7 @@ export default {
       };
 
       res["endpoint"] = el.find(
-        async el => (await el.element.load()).name.get() == name
+        async el => (await el.element.load()).type.get() == name
       );
 
       return res;

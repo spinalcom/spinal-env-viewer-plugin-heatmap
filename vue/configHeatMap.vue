@@ -19,28 +19,6 @@
 
         <div class="md-layout md-gutter">
 
-          <!-- <div :class="'md-layout-item md-size-' + Math.floor(100/configs.length)"
-               v-for="(conf,index) in configs"
-               :key="index">
-            <span class="md-caption">{{conf.name}}</span>
-            <md-field md-inline>
-              <md-input type="number"
-                        :disabled="conf.name == 'average' || isBoolean"
-                        v-model="conf.value"
-                        @change="calculateAverage"></md-input>
-            </md-field>
-
-            <span class="md-caption">Color</span>
-
-            <div class="colorContainer">
-              <div class="current-color"
-                   :style="'background-color: ' + conf.color"
-                   @click="togglePicker(conf)"></div>
-              <chrome-picker v-model="conf.color"
-                             v-if="conf.display" />
-            </div>
-          </div> -->
-
           <div class="md-layout-item"
                :class="!isBoolean() ? 'md-size-33' : 'md-size-50'"
                v-if="min">
@@ -135,6 +113,7 @@ import HeatMap from "../heatMapModel";
 import { dashboardVariables } from "spinal-env-viewer-dashboard-standard-service";
 import { Chrome } from "vue-color";
 import { color } from "../colors";
+import { heatmapService } from "spinal-env-viewer-heatmap-service";
 
 // let tinygradient = require("tinygradient");
 
@@ -164,16 +143,10 @@ export default {
         this.choices = el.sensor.get();
       });
     },
-    async removed(option) {
+    removed(option) {
       if (option) {
-        let heatMapConnected = await SpinalGraphService.getChildren(
+        heatmapService.createHeatMap(
           this.nodeSelected.id.get(),
-          [RELATION_NAME]
-        );
-
-        if (heatMapConnected.length > 0) return;
-
-        let heatMap = new HeatMap(
           this.selected.name,
           this.min.name,
           this.min.value,
@@ -184,20 +157,6 @@ export default {
           this.average ? this.average.name : null,
           this.average ? this.average.value : null,
           this.average ? this.average.color : null
-        );
-
-        let heatMapNode = SpinalGraphService.createNode(
-          {
-            name: this.selected.name
-          },
-          heatMap
-        );
-
-        SpinalGraphService.addChild(
-          this.nodeSelected.id.get(),
-          heatMapNode,
-          RELATION_NAME,
-          SPINAL_RELATION_TYPE
         );
       }
       this.showDialog = false;

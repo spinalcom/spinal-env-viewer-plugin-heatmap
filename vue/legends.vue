@@ -72,7 +72,7 @@ export default {
 <style>
 .legends {
   width: 50px;
-  height: 100%;
+  height: 90%;
   color: black;
   display: inline-block;
   margin-right: 20px;

@@ -6,17 +6,19 @@ import {
   dashboardVariables
 } from "spinal-env-viewer-dashboard-standard-service";
 
-import {
-  SpinalGraphService
-} from "spinal-env-viewer-graph-service";
+// import {
+//   SpinalGraphService
+// } from "spinal-env-viewer-graph-service";
 
-import bimobjService from 'spinal-env-viewer-plugin-bimobjectservice';
+// import bimobjService from 'spinal-env-viewer-plugin-bimobjectservice';
 
 import utilities from "../utilities";
 
+let heatMaps = new Map();
 
 class ActiveMapConf extends SpinalContextApp {
   constructor() {
+
     super("active heatmap", "This button active a heatmap", {
       icon: "remove_red_eye",
       icon_type: "in",
@@ -26,6 +28,10 @@ class ActiveMapConf extends SpinalContextApp {
   }
 
   isShown(option) {
+    typeof heatMaps.get(option.selectedNode.id.get()) === "undefined" ? this.buttonCfg
+      .fontColor = "#FFFFFF" : this.buttonCfg.fontColor = "#FF0000";
+
+
     return utilities.hasHeatMap(option.selectedNode.id.get()).then(el => {
       if (
         option.context.type.get() ==
@@ -37,35 +43,25 @@ class ActiveMapConf extends SpinalContextApp {
     });
   }
 
-  async action(option) {
-    utilities.eventBus.$emit('add-legends', option.selectedNode);
+  action(option) {
+    // this.fontColor = "#FF0000"
+    let activeIt;
 
-    let endpoints = [];
-    let heatmap = (await utilities.hasHeatMap(option.selectedNode.id.get()))[
-      0];
-
-    let itemsConnected = await SpinalGraphService.getChildren(
-      option.selectedNode.id.get(),
-      [dashboardVariables.DASHBOARD_TO_ELEMENT_RELATION]
-    );
-
-    for (let i = 0; i < itemsConnected.length; i++) {
-      endpoints.push(
-        utilities.getElementEndpoint(itemsConnected[i].id.get(), heatmap.name
-          .get())
-      );
+    if (typeof heatMaps.get(option.selectedNode.id.get()) === "undefined") {
+      this.fontColor = "#FF0000";
+      heatMaps.set(option.selectedNode.id.get(), option.selectedNode.id.get());
+      activeIt = true;
+    } else {
+      this.fontColor = "#FFFFFF";
+      heatMaps.delete(option.selectedNode.id.get());
+      activeIt = false;
     }
-
-    Promise.all(endpoints).then(el => {
-      el.forEach(endpoint => {
-        SpinalGraphService.getChildren(endpoint.parentId, [
-          bimobjService.constants.REFERENCE_OBJECT_RELATION_NAME
-        ]).then(equipment => {
-          utilities.colorElement(equipment, endpoint.endpoint,
-            heatmap);
-        });
-      });
+    utilities.eventBus.$emit('add-legends', {
+      active: activeIt,
+      node: option.selectedNode
     });
+
+
   }
 }
 

@@ -12,6 +12,10 @@
 <script>
 import legendComponent from "./legends.vue";
 import utilities from "../utilities";
+// import HeatMap from "../heatMapModel";
+import bimobjService from "spinal-env-viewer-plugin-bimobjectservice";
+import { SpinalGraphService } from "spinal-env-viewer-graph-service";
+import { dashboardVariables } from "spinal-env-viewer-dashboard-standard-service";
 
 export default {
   name: "legendsHeatmap",
@@ -22,19 +26,52 @@ export default {
     };
   },
   mounted() {
-    utilities.eventBus.$on("add-legends", node => {
-      console.log("event called");
-      for (let i = 0; i < this.legends.length; i++) {
-        const element = this.legends[i];
-        if (element.id.get() == node.id.get()) return;
+    utilities.eventBus.$on("add-legends", res => {
+      if (res.active) {
+        this.legends.push(res.node);
+        this.activeHeatMap(res.node.id.get());
+      } else {
+        for (let i = 0; i < this.legends.length; i++) {
+          const element = this.legends[i];
+          if (element.id.get() == res.node.id.get()) {
+            this.legends.splice(i, 1);
+          }
+        }
       }
-
-      this.legends.push(node);
     });
   },
-  methods: {},
-  destroyed() {
-    console.log("destroyed");
+  methods: {
+    getAllEndpoints(dashboardId) {
+      return utilities.hasHeatMap(dashboardId).then(heatmap => {
+        let endpoints = [];
+        return SpinalGraphService.getChildren(dashboardId, [
+          dashboardVariables.DASHBOARD_TO_ELEMENT_RELATION
+        ]).then(itemsConnected => {
+          for (let i = 0; i < itemsConnected.length; i++) {
+            endpoints.push(
+              utilities.getElementEndpoint(
+                itemsConnected[i].id.get(),
+                heatmap[0].name.get()
+              )
+            );
+          }
+          return { endpoints: endpoints, heatmap: heatmap[0] };
+        });
+      });
+    },
+    activeHeatMap(dashboardId) {
+      this.getAllEndpoints(dashboardId).then(res => {
+        Promise.all(res.endpoints).then(el => {
+          el.forEach(endpoint => {
+            SpinalGraphService.getChildren(endpoint.parentId, [
+              bimobjService.constants.REFERENCE_OBJECT_RELATION_NAME
+            ]).then(equipment => {
+              utilities.colorElement(equipment, endpoint.endpoint, res.heatmap);
+            });
+          });
+        });
+      });
+    }
   }
 };
 </script>
