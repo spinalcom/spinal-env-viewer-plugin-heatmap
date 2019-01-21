@@ -9,25 +9,31 @@ import {
   dashboardVariables
 } from "spinal-env-viewer-dashboard-standard-service";
 
-
 const RELATION_NAME = "hasHeatMap";
 
-import Vue from 'vue';
-
+import Vue from "vue";
 
 export default {
   eventBus: new Vue(),
-  getElementEndpoint(id, name) {
+  getEndpointNodeElement(id) {
     return SpinalGraphService.getChildren(id, [
       dashboardVariables.ENDPOINT_RELATION_NAME
     ]).then(el => {
+      let promises = [];
+      for (let index = 0; index < el.length; index++) {
+        promises.push(el[index].element.load());
+      }
+      return promises;
+    });
+  },
+  async getElementEndpoint(id, name) {
+    let promises = await this.getEndpointNodeElement(id);
+    return Promise.all(promises).then(endpoints => {
       let res = {
         parentId: id
       };
 
-      res["endpoint"] = el.find(
-        async el => (await el.element.load()).type.get() == name
-      );
+      res["endpoint"] = endpoints.find(el => el.type.get() === name);
 
       return res;
     });
@@ -39,19 +45,27 @@ export default {
     });
   },
 
-  async colorElement(equipments, endpointInfo, argHeatmap) {
-    let heatMap = await argHeatmap.element.load();
-    let endpoint = await endpointInfo.element.load();
-    endpoint.currentValue.bind(() => {
-      let color = this.getElementColor(endpoint.currentValue.get(),
-        heatMap);
-      console.log("color", color)
-      let itemToColor = [];
-      for (let i = 0; i < equipments.length; i++) {
-        const element = equipments[i];
-        itemToColor.push(element.dbid.get());
-      }
-      window.v.setColorMaterial(itemToColor, `#${color}`, endpoint.id.get());
+  colorElement(equipments, endpointValue, heatMap) {
+    let color = this.getElementColor(endpointValue, heatMap);
+
+    let rgbColor = this.convertHexColorToRGB(`#${color}`);
+
+    let realColor = rgbColor ?
+      new THREE.Vector4(
+        rgbColor.r / 255,
+        rgbColor.g / 255,
+        rgbColor.b / 255,
+        0.7
+      ) :
+      new THREE.Vector4(1, 0, 0, 0.7);
+
+    equipments.forEach(element => {
+      window.v.setThemingColor(element, realColor);
+    });
+  },
+  restoreColor(equipments) {
+    equipments.forEach(element => {
+      window.v.setThemingColor(element, new THREE.Vector4(0, 0, 0, 0));
     });
   },
 
@@ -63,5 +77,14 @@ export default {
     let gradient = color.getGradientColor(min, average, max);
 
     return color.getColor(elementValue, min.value, max.value, gradient);
+  },
+  convertHexColorToRGB(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+      } :
+      null;
   }
-}
+};

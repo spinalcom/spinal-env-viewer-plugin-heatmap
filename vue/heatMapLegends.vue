@@ -4,7 +4,8 @@
     <div class="legend-title md-title">HeatMap Legends</div>
     <legend-component v-for="(legend,index) in legends"
                       :key="index"
-                      :heat-map-parent-node="legend"></legend-component>
+                      :heat-map-parent-node="legend"
+                      :ref="legend.id.get()"></legend-component>
   </div>
 </template>
 
@@ -29,8 +30,9 @@ export default {
     utilities.eventBus.$on("add-legends", res => {
       if (res.active) {
         this.legends.push(res.node);
-        this.activeHeatMap(res.node.id.get());
+        // this.activeHeatMap(res.node.id.get());
       } else {
+        this.$refs[res.node.id.get()][0].restoreColor(true);
         for (let i = 0; i < this.legends.length; i++) {
           const element = this.legends[i];
           if (element.id.get() == res.node.id.get()) {
@@ -72,6 +74,9 @@ export default {
         });
       });
     }
+  },
+  destroyed() {
+    console.log("destroyed");
   }
 };
 </script>
