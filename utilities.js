@@ -51,12 +51,14 @@ export default {
     let rgbColor = this.convertHexColorToRGB(`#${color}`);
 
     let realColor = rgbColor ?
+      // eslint-disable-next-line no-undef
       new THREE.Vector4(
         rgbColor.r / 255,
         rgbColor.g / 255,
         rgbColor.b / 255,
         0.7
       ) :
+      // eslint-disable-next-line no-undef
       new THREE.Vector4(1, 0, 0, 0.7);
 
     equipments.forEach(element => {
@@ -65,6 +67,7 @@ export default {
   },
   restoreColor(equipments) {
     equipments.forEach(element => {
+      // eslint-disable-next-line no-undef
       window.v.setThemingColor(element, new THREE.Vector4(0, 0, 0, 0));
     });
   },

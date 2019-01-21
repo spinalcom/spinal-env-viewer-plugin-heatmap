@@ -1,12 +1,12 @@
 <template>
-  <div class="md-scrollbar legendsContainer"
-       v-if="legends.length > 0">
+  <md-content class="md-scrollbar legendsContainer"
+              v-if="legends.length > 0">
     <div class="legend-title md-title">HeatMap Legends</div>
     <legend-component v-for="(legend,index) in legends"
                       :key="index"
                       :heat-map-parent-node="legend"
                       :ref="legend.id.get()"></legend-component>
-  </div>
+  </md-content>
 </template>
 
 
@@ -85,6 +85,7 @@ export default {
 .legendsContainer {
   width: calc(20%);
   height: calc(40%);
+  background: none !important;
   border: 1px solid red;
   overflow-x: auto;
   position: absolute;

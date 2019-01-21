@@ -1,31 +1,39 @@
 <template>
   <div class="legends">
-    <!-- <div class="icon">
-      <md-icon class="legendIcon">add</md-icon>
-      &nbsp;
-      <md-icon class="legendIcon">expand_more</md-icon>
-    </div> -->
 
-    <!-- <div class="icon"> -->
     <md-menu class="icon"
-             md-size="small">
+             md-size="small"
+             :mdCloseOnClick="true"
+             v-if="heatMapTypeSelected">
+
       <md-button class="btn-trigger"
-                 md-menu-trigger>
-        <md-icon class="legendIcon">add</md-icon>
-        &nbsp;
-        <md-icon class="legendIcon">expand_more</md-icon>
+                 md-menu-trigger
+                 :title="heatMapTypeSelected.name.get()">
+
+        <md-icon class="menu_icon legendIcon"
+                 v-if="getIcon(heatMapTypeSelected.name.get())">
+          {{getIcon(heatMapTypeSelected.name.get())}}
+        </md-icon>
+
+        <md-icon class="menu_icon legendIcon"
+                 v-if="!getIcon(heatMapTypeSelected.name.get())"
+                 :md-src="getSvg(heatMapTypeSelected.name.get())"></md-icon>
+
       </md-button>
 
       <md-menu-content>
-        <md-menu-item>
-          <md-button @click="changeHeatmap('Temperature')">
-            <md-icon class="legendIcon">add</md-icon>
-            &nbsp;
-            <span>Temperature</span>
-          </md-button>
+        <md-menu-item v-for="(heatmap,index) in heatMaps"
+                      :key="index"
+                      @click="changeHeatmap(heatmap)">
 
+          <md-icon class="legendIcon"
+                   v-if="getIcon(heatmap.name.get())">{{getIcon(heatmap.name.get())}}</md-icon>
+
+          <md-icon v-if="!getIcon(heatmap.name.get())"
+                   :md-src="getSvg(heatmap.name.get())"></md-icon>
+          {{heatmap.name.get()}}
         </md-menu-item>
-        <md-menu-item>
+        <!-- <md-menu-item>
           <md-button @click="changeHeatmap('Power')">
             <md-icon class="legendIcon">add</md-icon>
             &nbsp;
@@ -40,7 +48,7 @@
             <span>Alarm</span>
           </md-button>
 
-        </md-menu-item>
+        </md-menu-item> -->
       </md-menu-content>
     </md-menu>
     <!-- </div> -->
@@ -70,7 +78,12 @@ import utilities from "../utilities";
 import { dashboardVariables } from "spinal-env-viewer-dashboard-standard-service";
 import bimobjService from "spinal-env-viewer-plugin-bimobjectservice";
 import { heatmapService } from "spinal-env-viewer-heatmap-service";
-const RELATION_NAME = "hasHeatMap";
+import endpointTypes from "../endpointTypes";
+
+// eslint-disable-next-line no-unused-vars
+const temperature = require("../assets/temperature.svg");
+// eslint-disable-next-line no-unused-vars
+const hydrometry = require("../assets/hydrometry.svg");
 
 export default {
   name: "legendComponent",
@@ -79,10 +92,15 @@ export default {
     return {
       data: [],
       bindProcessMap: new Map(),
-      heatMapTypeSelected: null
+      heatMapTypeSelected: null,
+      heatMaps: []
     };
   },
   mounted() {
+    this.getNodeHeatMap().then(el => {
+      console.log("el", el);
+      this.heatMaps = el;
+    });
     this.changeThisHeatMapType("Temperature").then(() => {
       this.colorHeatMap();
     });
@@ -170,13 +188,18 @@ export default {
         return itemToColor;
       });
     },
-    changeThisHeatMapType(name) {
-      return heatmapService
-        .getHeatMap(this.heatMapParentNode.id.get(), name)
-        .then(async el => {
-          if (el) this.heatMapTypeSelected = await el.element.load();
-          return;
-        });
+    changeThisHeatMapType(heatmap) {
+      if (typeof heatmap === "string") {
+        return heatmapService
+          .getHeatMap(this.heatMapParentNode.id.get(), heatmap)
+          .then(async el => {
+            if (el) this.heatMapTypeSelected = await el.element.load();
+            return;
+          });
+      } else {
+        this.heatMapTypeSelected = heatmap;
+        return Promise.resolve(false);
+      }
     },
     restoreColor(hide = false) {
       this.bindProcessMap.forEach((value, key) => {
@@ -189,7 +212,7 @@ export default {
       return Promise.resolve(true);
     },
     changeHeatmap(heatMapType) {
-      if (this.heatMapTypeSelected.name.get() !== heatMapType) {
+      if (this.heatMapTypeSelected.name.get() !== heatMapType.name.get()) {
         this.restoreColor().then(() => {
           this.changeThisHeatMapType(heatMapType).then(() => {
             this.colorHeatMap();
@@ -214,6 +237,26 @@ export default {
           });
         });
       });
+    },
+    getNodeHeatMap() {
+      return heatmapService
+        .getHeatMap(this.heatMapParentNode.id.get())
+        .then(async heatMaps => {
+          let promises = [];
+          heatMaps.forEach(el => {
+            promises.push(el.element.load());
+          });
+          let heaMapsElement = await Promise.all(promises);
+          return heaMapsElement;
+        });
+    },
+    getIcon(type) {
+      let icon = endpointTypes.find(el => el.type === type).icon;
+
+      return icon.trim().length > 0 ? icon : undefined;
+    },
+    getSvg(type) {
+      return eval(type.toLowerCase());
     }
   },
   watch: {
@@ -246,8 +289,8 @@ export default {
 }
 
 .legends .icon .legendIcon {
-  min-width: 10px !important;
-  width: 10px;
+  min-width: 20px !important;
+  width: 20px;
 }
 
 .legends .colors {
@@ -295,5 +338,9 @@ export default {
   text-overflow: ellipsis;
   /* border-top: 1px solid gray; */
   padding-top: 5px;
+}
+
+.legends .icon .menu_icon {
+  color: #000000 !important;
 }
 </style>
