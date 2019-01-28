@@ -9,6 +9,10 @@ import {
   dashboardVariables
 } from "spinal-env-viewer-dashboard-standard-service";
 
+import {
+  SpinalGraphService
+} from "spinal-env-viewer-graph-service";
+
 // import {
 //   toasted
 // } from "../toats";
@@ -30,18 +34,28 @@ class HeatMapConf extends SpinalContextApp {
   }
 
   isShown(option) {
-    if (option.context.type.get() == dashboardVariables.DASHBOARD_CONTEXT_TYPE &&
-      option
-      .context.id.get() !== option.selectedNode
-      .id
-      .get())
-      return Promise.resolve(true);
-    return Promise.resolve(-1);
+    return SpinalGraphService.getRealNode(option.selectedNode.id.get()).getParents()
+      .then(
+        parents => {
+          if (option.context.type.get() == dashboardVariables.DASHBOARD_CONTEXT_TYPE &&
+            this.isOptionContextChild(parents, option.context))
+            return true;
+          return -1;
+        })
   }
 
   action(option) {
     spinalPanelManagerService.openPanel('configHeatMapDialog', option.selectedNode);
   }
+
+  isOptionContextChild(parentList, context) {
+    for (let index = 0; index < parentList.length; index++) {
+      const element = parentList[index].info;
+      if (element.id.get() === context.id.get()) return true;
+    }
+    return false;
+  }
+
 }
 
 export default HeatMapConf;

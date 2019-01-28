@@ -83,7 +83,7 @@ import endpointTypes from "../endpointTypes";
 // eslint-disable-next-line no-unused-vars
 const temperature = require("../assets/temperature.svg");
 // eslint-disable-next-line no-unused-vars
-const hydrometry = require("../assets/hydrometry.svg");
+const hygrometry = require("../assets/hygrometry.svg");
 
 export default {
   name: "legendComponent",
