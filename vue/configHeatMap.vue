@@ -109,7 +109,7 @@ import {
   SPINAL_RELATION_TYPE,
   SpinalGraphService
 } from "spinal-env-viewer-graph-service";
-import HeatMap from "../heatMapModel";
+import HeatMap from "spinal-env-viewer-heatmap-service/build/heatMapModel.js";
 import { dashboardVariables } from "spinal-env-viewer-dashboard-standard-service";
 import { Chrome } from "vue-color";
 import { color } from "../colors";
