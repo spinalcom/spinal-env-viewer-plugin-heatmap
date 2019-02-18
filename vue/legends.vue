@@ -19,6 +19,9 @@
                  v-if="!getIcon(heatMapTypeSelected.name.get())"
                  :md-src="getSvg(heatMapTypeSelected.name.get())"></md-icon>
 
+        <md-icon class="menu_icon legendIcon"
+                 :md-src="getSvg('arrow_down')"></md-icon>
+
       </md-button>
 
       <md-menu-content>
@@ -84,6 +87,8 @@ import endpointTypes from "../endpointTypes";
 const temperature = require("../assets/temperature.svg");
 // eslint-disable-next-line no-unused-vars
 const hygrometry = require("../assets/hygrometry.svg");
+// eslint-disable-next-line no-unused-vars
+const arrow_down = require("../assets/arrow_down.svg");
 
 export default {
   name: "legendComponent",
@@ -270,17 +275,22 @@ export default {
 <style>
 .legends {
   width: 50px;
-  height: 90%;
-  color: black;
+  height: 98%;
+  color: white;
   display: inline-block;
   margin-right: 20px;
+  font-weight: bold;
+}
+
+.legends:last-child {
+  margin-right: 0px;
 }
 
 .legends .icon {
   width: calc(100%);
   height: calc(10%);
   border-bottom: 1px dashed gray;
-  color: #000000;
+  /* color: #000000; */
 }
 
 .legends .icon .btn-trigger {
@@ -322,7 +332,7 @@ export default {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  font-size: 10px;
+  font-size: 12px;
   padding-left: 4px;
   position: absolute;
   bottom: -10px;
@@ -341,6 +351,8 @@ export default {
 }
 
 .legends .icon .menu_icon {
-  color: #000000 !important;
+  /* color: #000000 !important; */
+  width: 20px;
+  display: inline-block;
 }
 </style>
