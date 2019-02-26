@@ -105,11 +105,8 @@
 </template>
 
 <script>
-import {
-  SPINAL_RELATION_TYPE,
-  SpinalGraphService
-} from "spinal-env-viewer-graph-service";
-import HeatMap from "spinal-env-viewer-heatmap-service/build/heatMapModel.js";
+import { SpinalGraphService } from "spinal-env-viewer-graph-service";
+// import HeatMap from "spinal-env-viewer-heatmap-service/build/heatMapModel.js";
 import { dashboardVariables } from "spinal-env-viewer-dashboard-standard-service";
 import { Chrome } from "vue-color";
 import { color } from "../colors";
@@ -117,7 +114,7 @@ import { heatmapService } from "spinal-env-viewer-heatmap-service";
 
 // let tinygradient = require("tinygradient");
 
-const RELATION_NAME = "hasHeatMap";
+// const RELATION_NAME = "hasHeatMap";
 
 export default {
   name: "configHeatMapDialog",
