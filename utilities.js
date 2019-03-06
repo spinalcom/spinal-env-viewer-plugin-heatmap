@@ -9,6 +9,10 @@ import {
   dashboardVariables
 } from "spinal-env-viewer-dashboard-standard-service";
 
+import {
+  toasted
+} from './toats';
+
 const RELATION_NAME = "hasHeatMap";
 
 import Vue from "vue";
@@ -45,25 +49,34 @@ export default {
     });
   },
 
-  colorElement(equipments, endpointValue, heatMap) {
-    let color = this.getElementColor(endpointValue, heatMap);
+  colorElement(nodeName, equipments, endpointValue, heatMap) {
 
-    let rgbColor = this.convertHexColorToRGB(`#${color}`);
+    if (equipments.length > 0) {
+      let color = this.getElementColor(endpointValue, heatMap);
 
-    let realColor = rgbColor ?
-      // eslint-disable-next-line no-undef
-      new THREE.Vector4(
-        rgbColor.r / 255,
-        rgbColor.g / 255,
-        rgbColor.b / 255,
-        0.7
-      ) :
-      // eslint-disable-next-line no-undef
-      new THREE.Vector4(1, 0, 0, 0.7);
+      let rgbColor = this.convertHexColorToRGB(`#${color}`);
 
-    equipments.forEach(element => {
-      window.v.setThemingColor(element, realColor);
-    });
+      let realColor = rgbColor ?
+        // eslint-disable-next-line no-undef
+        new THREE.Vector4(
+          rgbColor.r / 255,
+          rgbColor.g / 255,
+          rgbColor.b / 255,
+          0.7
+        ) :
+        // eslint-disable-next-line no-undef
+        new THREE.Vector4(1, 0, 0, 0.7);
+
+      equipments.forEach(element => {
+        window.v.setThemingColor(element, realColor);
+      });
+    } else {
+      toasted.error(
+        `${nodeName} has no reference`)
+    }
+
+
+
   },
   restoreColor(equipments) {
     equipments.forEach(element => {

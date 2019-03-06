@@ -103,7 +103,6 @@ export default {
   },
   mounted() {
     this.getNodeHeatMap().then(el => {
-      console.log("el", el);
       this.heatMaps = el;
     });
     this.changeThisHeatMapType("Temperature").then(() => {
@@ -112,11 +111,6 @@ export default {
   },
   methods: {
     getColorsAndValue() {
-      // SpinalGraphService.getChildren(this.heatMapParentNode.id.get(), [
-      //   RELATION_NAME
-      // ]).then(async el => {
-      // let heatMap = heatMapType ? await this.get : await el[0].element.load();
-
       if (this.heatMapTypeSelected) {
         let max = this.heatMapTypeSelected.max.get();
         let min = this.heatMapTypeSelected.min.get();
@@ -169,6 +163,7 @@ export default {
             // res.endpoint.element.load().then(endpoint => {
             let bindProcess = res.endpoint.currentValue.bind(async () => {
               utilities.colorElement(
+                SpinalGraphService.getInfo(res.parentId).name.get(),
                 await this.getEquipmentsDbId(res.parentId),
                 res.endpoint.currentValue.get(),
                 this.heatMapTypeSelected
@@ -237,6 +232,7 @@ export default {
           promises.push(this.getEquipmentsDbId(el.id.get()));
         });
         Promise.all(promises).then(equipmentsList => {
+          this.unBindAll();
           equipmentsList.forEach(equipments => {
             utilities.restoreColor(equipments);
           });
@@ -262,6 +258,11 @@ export default {
     },
     getSvg(type) {
       return eval(type.toLowerCase());
+    },
+    unBindAll() {
+      this.bindProcessMap.forEach((value, key) => {
+        key.currentValue.unbind(value);
+      });
     }
   },
   watch: {
