@@ -215,40 +215,95 @@ export default {
     },
     selectedChanged(index) {
       this.selected = this.choices[index];
-      this.getColor();
-      this.gradient = color.getGradientColor(this.min, this.average, this.max);
+      this.getColor().then(() => {
+        this.gradient = color.getGradientColor(
+          this.min,
+          this.average,
+          this.max
+        );
+      });
     },
     getColor() {
-      this.min = {
-        name: !this.isBoolean() ? "min" : "False",
-        value: !this.isBoolean() ? 0 : false,
-        color: "#a20404",
-        display: false,
-        disabled: this.isBoolean()
-      };
+      return heatmapService
+        .getHeatMap(this.nodeSelected.id.get(), this.selected.name)
+        .then(heatMapFound => {
+          if (heatMapFound) {
+            return heatMapFound.element.load().then(el => {
+              if (el.min) {
+                this.min = {
+                  name: el.min.name.get(),
+                  value: el.min.value.get(),
+                  color: el.min.color.get(),
+                  display: false,
+                  disabled: this.isBoolean()
+                };
+              }
+              if (el.average) {
+                this.average = {
+                  name: el.average.name.get(),
+                  value: el.average.value.get(),
+                  color: el.average.color.get(),
+                  display: false,
+                  disabled: this.isBoolean()
+                };
+              }
 
-      if (!this.isBoolean()) {
-        this.average = {
-          name: "average",
-          value: 15,
-          color: "#ffff00",
-          display: false,
-          disabled: true
-        };
-      } else {
-        this.average = null;
-      }
+              if (el.max) {
+                this.max = {
+                  name: el.max.name.get(),
+                  value: el.max.value.get(),
+                  color: el.max.color.get(),
+                  display: false,
+                  disabled: this.isBoolean()
+                };
+              }
+              return;
+            });
+          } else {
+            this.min = {
+              name: !this.isBoolean() ? "min" : "False",
+              value: !this.isBoolean() ? 0 : false,
+              color: "#a20404",
+              display: false,
+              disabled: this.isBoolean()
+            };
 
-      this.max = {
-        name: !this.isBoolean() ? "max" : "True",
-        value: !this.isBoolean() ? 30 : true,
-        color: "#2ed924",
-        display: false,
-        disabled: this.isBoolean()
-      };
+            this.max = {
+              name: !this.isBoolean() ? "max" : "True",
+              value: !this.isBoolean() ? 30 : true,
+              color: "#2ed924",
+              display: false,
+              disabled: this.isBoolean()
+            };
+
+            if (!this.isBoolean()) {
+              this.average = {
+                name: "average",
+                value: (this.min.value + this.max.value) / 2,
+                color: "#ffff00",
+                display: false,
+                disabled: true
+              };
+            } else {
+              this.average = null;
+            }
+            return;
+          }
+        });
     },
     isBoolean() {
       return this.selected && this.selected.dataType == "Boolean";
+    },
+    getMapValue(heatMap, val) {
+      let obj = {
+        value: null,
+        color: null
+      };
+      if (heatMap[val]) {
+        (obj.value = heatMap[val].value.get()),
+          (obj.color = heatMap[val].color.get());
+      }
+      return obj;
     }
   }
 };

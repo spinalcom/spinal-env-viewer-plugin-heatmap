@@ -15,12 +15,18 @@ let color = {
     if (typeof minValue === "boolean" && typeof maxValue === "boolean")
       return value ? gradientColor[1].toHex() : gradientColor[0].toHex();
 
-    let index = Math.floor(((value - minValue) * 10) / (maxValue -
-      minValue));
+    if (!isNaN(value)) {
+      let index = Math.floor(((value - minValue) * 10) / (maxValue -
+        minValue));
 
-    if (index < 0 || index >= gradientColor.length) index = 0;
+      if (index < 0 || index >= gradientColor.length)
+        index = gradientColor.length - 1;
 
-    return gradientColor[index].toHex();
+
+      return gradientColor[index].toHex();
+    }
+    return undefined;
+
   }
 }
 

@@ -65,7 +65,7 @@ export default {
           0.7
         ) :
         // eslint-disable-next-line no-undef
-        new THREE.Vector4(1, 0, 0, 0.7);
+        new THREE.Vector4(1, 0, 0, 0);
 
       equipments.forEach(element => {
         window.v.setThemingColor(element, realColor);
