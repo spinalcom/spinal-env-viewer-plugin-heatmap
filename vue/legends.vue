@@ -137,7 +137,7 @@ export default {
       if (isNaN(parseInt(min)) && isNaN(parseInt(max)))
         return index ? "True" : "False";
 
-      return min + ((max - min) * index) / 10;
+      return Number(min) + ((Number(max) - Number(min)) * Number(index)) / 10;
     },
     getEndpointsToBind() {
       return SpinalGraphService.getChildren(this.heatMapParentNode.id.get(), [
