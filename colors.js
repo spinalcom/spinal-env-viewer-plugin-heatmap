@@ -19,8 +19,11 @@ let color = {
       let index = Math.floor(((value - minValue) * 10) / (maxValue -
         minValue));
 
-      if (index < 0 || index >= gradientColor.length)
+      if (index < 0) {
+        index = 0;
+      } else if (index >= gradientColor.length) {
         index = gradientColor.length - 1;
+      }
 
 
       return gradientColor[index].toHex();
