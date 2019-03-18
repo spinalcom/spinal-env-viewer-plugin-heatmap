@@ -16,8 +16,8 @@ const {
 
 
 
-spinalContextMenuService.registerApp(sidebarName, new HeatMapConf());
-spinalContextMenuService.registerApp(sidebarName, new ActiveMapConf());
+spinalContextMenuService.registerApp(sidebarName, new HeatMapConf(), [3]);
+spinalContextMenuService.registerApp(sidebarName, new ActiveMapConf(), [15]);
 
 
 const dialogs = [{
