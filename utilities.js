@@ -9,9 +9,9 @@ import {
   dashboardVariables
 } from "spinal-env-viewer-dashboard-standard-service";
 
-import {
-  toasted
-} from './toats';
+// import {
+//   toasted
+// } from './toats';
 
 const RELATION_NAME = "hasHeatMap";
 
@@ -71,8 +71,8 @@ export default {
         window.v.setThemingColor(element, realColor);
       });
     } else {
-      toasted.error(
-        `${nodeName} has no reference`)
+      // toasted.error(
+      //   `${nodeName} has no reference`)
     }
 
 
