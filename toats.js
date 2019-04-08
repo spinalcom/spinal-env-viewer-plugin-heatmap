@@ -1,8 +1,8 @@
-import Vue from "vue";
-import Toasted from "vue-toasted";
+import Vue from "vue";/*
+//import Toasted from "vue-toasted";
 
 
-Vue.use(Toasted);
+//Vue.use(Toasted);*/
 
 
 const option = {
@@ -14,14 +14,18 @@ const option = {
 let toasted = {
 
   success: function(message) {
-    Vue.toasted.success(message, option);
+    console.log('Vue Toasted message:', message);
+    //Vue.toasted.success(message, option);
   },
 
   error: function(message) {
-    Vue.toasted.error(message, option);
+    console.error('Vue Toasted message:', message);
+    //Vue.toasted.error(message, option);
   },
+  
   warning: function(message) {
-    Vue.toasted.info(message, option);
+    console.warn('Vue Toasted message:', message);
+    //Vue.toasted.info(message, option);
   }
 
 };
