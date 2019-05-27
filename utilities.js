@@ -68,7 +68,8 @@ export default {
         new THREE.Vector4(1, 0, 0, 0);
 
       equipments.forEach(element => {
-        window.v.setThemingColor(element, realColor);
+        
+        window.v.setThemingColor(element, realColor, window.spinal.assemblyManagerService._getCurrentModel());
       });
     } else {
       // toasted.error(
@@ -81,7 +82,7 @@ export default {
   restoreColor(equipments) {
     equipments.forEach(element => {
       // eslint-disable-next-line no-undef
-      window.v.setThemingColor(element, new THREE.Vector4(0, 0, 0, 0));
+      window.v.setThemingColor(element, new THREE.Vector4(0, 0, 0, 0),  window.spinal.assemblyManagerService._getCurrentModel());
     });
   },
 
