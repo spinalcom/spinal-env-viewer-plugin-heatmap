@@ -30,7 +30,8 @@
                       @click="changeHeatmap(heatmap)">
 
           <md-icon class="legendIcon"
-                   v-if="getIcon(heatmap.name.get())">{{getIcon(heatmap.name.get())}}</md-icon>
+                   v-if="getIcon(heatmap.name.get())">
+            {{getIcon(heatmap.name.get())}}</md-icon>
 
           <md-icon v-if="!getIcon(heatmap.name.get())"
                    :md-src="getSvg(heatmap.name.get())"></md-icon>
@@ -70,7 +71,8 @@
     </div>
 
     <div class="name"
-         v-tooltip="heatMapParentNode.name.get()">{{heatMapParentNode.name.get()}}</div>
+         v-tooltip="heatMapParentNode.name.get()">
+      {{heatMapParentNode.name.get()}}</div>
   </div>
 </template>
 
@@ -153,6 +155,7 @@ export default {
             )
           );
         }
+
         return endpoints;
       });
     },
@@ -161,16 +164,19 @@ export default {
         Promise.all(endpoints).then(el => {
           el.forEach(res => {
             // res.endpoint.element.load().then(endpoint => {
-            let bindProcess = res.endpoint.currentValue.bind(async () => {
-              utilities.colorElement(
-                SpinalGraphService.getInfo(res.parentId).name.get(),
-                await this.getEquipmentsDbId(res.parentId),
-                res.endpoint.currentValue.get(),
-                this.heatMapTypeSelected
-              );
-            });
 
-            this.bindProcessMap.set(res.endpoint, bindProcess);
+            if (res.endpoint) {
+              let bindProcess = res.endpoint.currentValue.bind(async () => {
+                utilities.colorElement(
+                  SpinalGraphService.getInfo(res.parentId).name.get(),
+                  await this.getEquipmentsDbId(res.parentId),
+                  res.endpoint.currentValue.get(),
+                  this.heatMapTypeSelected
+                );
+              });
+
+              this.bindProcessMap.set(res.endpoint, bindProcess);
+            }
             // });
           });
         });
@@ -178,12 +184,14 @@ export default {
     },
     getEquipmentsDbId(nodeId) {
       return SpinalGraphService.getChildren(nodeId, [
-        bimobjService.constants.REFERENCE_OBJECT_RELATION_NAME
+        bimobjService.constants.REFERENCE_OBJECT_RELATION_NAME,
+        "hasReference"
       ]).then(equipments => {
         let itemToColor = [];
         for (let i = 0; i < equipments.length; i++) {
           const element = equipments[i];
-          itemToColor.push(element.dbid.get());
+          // itemToColor.push(element.dbid.get());
+          itemToColor.push(element.get());
         }
         return itemToColor;
       });

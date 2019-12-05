@@ -91,7 +91,7 @@ export default {
   border: 1px solid black;
   overflow-x: auto;
   position: absolute;
-  right: 0px;
+  left: 0px;
   top: calc(20%);
   padding: 10px;
 }

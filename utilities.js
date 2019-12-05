@@ -21,8 +21,9 @@ export default {
   eventBus: new Vue(),
   getEndpointNodeElement(id) {
     return SpinalGraphService.getChildren(id, [
-      dashboardVariables.ENDPOINT_RELATION_NAME
+      dashboardVariables.ENDPOINT_RELATION_NAME, "hasEndPoint"
     ]).then(el => {
+
       let promises = [];
       for (let index = 0; index < el.length; index++) {
         promises.push(el[index].element.load());
@@ -67,8 +68,18 @@ export default {
         // eslint-disable-next-line no-undef
         new THREE.Vector4(1, 0, 0, 0);
 
+
+
       equipments.forEach(element => {
-        window.v.setThemingColor(element, realColor);
+
+        let model = window.spinal.BimObjectService.getModelByBimfile(
+          element.bimFileId);
+
+        model.setThemingColor(element.dbid, realColor, true)
+
+
+
+        // window.v.setThemingColor(element, realColor);
       });
     } else {
       // toasted.error(
@@ -81,7 +92,9 @@ export default {
   restoreColor(equipments) {
     equipments.forEach(element => {
       // eslint-disable-next-line no-undef
-      window.v.setThemingColor(element, new THREE.Vector4(0, 0, 0, 0));
+      // window.v.setThemingColor(element, new THREE.Vector4(0, 0, 0, 0));
+      spinal.ForgeViewer.viewer.setThemingColor(element, new THREE.Vector4(
+        0, 0, 0, 0));
     });
   },
 
